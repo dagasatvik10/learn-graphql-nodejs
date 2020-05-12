@@ -27,6 +27,22 @@ const resolvers = {
       links.push(link);
       return link;
     },
+    updateLink: (parent, args) => {
+      const tempLinks = links.slice();
+      const linkIndex = tempLinks.findIndex((l) => l.id === args.id);
+      const link = tempLinks[linkIndex];
+      if (link) {
+        if (args.url) {
+          link.url = args.url;
+        }
+        if (args.description) {
+          link.description = args.description;
+        }
+        tempLinks.splice(linkIndex, 1, link);
+        links = tempLinks;
+        return link;
+      }
+    },
     deleteLink: (parent, args) => {
       const tempLinks = links.slice();
       const linkIndex = tempLinks.findIndex((l) => l.id === args.id);
