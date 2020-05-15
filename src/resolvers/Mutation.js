@@ -27,6 +27,24 @@ function deleteLink(root, args, context, info) {
   return context.prisma.deleteLink({ id: args.id });
 }
 
+async function vote(root, args, context, info) {
+  const userId = getUserId(context);
+  const linkId = args.linkId;
+
+  const voteExists = await context.prisma.$exists.vote({ user: { id: userId }, link: { id: linkId } });
+
+  console.log(voteExists);
+
+  if (voteExists) {
+    throw new Error(`Already voted for link: ${args.linkId}`);
+  }
+
+  return context.prisma.createVote({
+    link: { connect: { id: linkId } },
+    user: { connect: { id: userId } },
+  });
+}
+
 async function signup(root, args, context, info) {
   const hashedPassword = await bcrypt.hash(args.password, 10);
 
@@ -63,6 +81,7 @@ module.exports = {
   post,
   updateLink,
   deleteLink,
+  vote,
   signup,
   login,
 };
